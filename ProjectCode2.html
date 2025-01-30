@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eea1a1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #ec8686;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            display: none; /* Initially hidden */
+        }
+
+        .login-container.active {
+            display: block; /* Display when active */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .login-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #efeaeb;
+            color: black;
+            margin-top: 10px;
+        }
+
+        .product-list, .admin-menu, .user-menu {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+
+        .product-item {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Title -->
+    <h1>Event Management System</h1>
+
+    <!-- Role Selection Container -->
+    <div class="login-container active" id="roleSelectionContainer">
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="role">Role:</label>
+                <select name="role" id="role">
+                    <option value="Admin">Admin</option>
+                    <option value="Vendor">Vendor</option>
+                    <option value="User">User</option>
+                </select>
+            </div>
+            <button type="submit" id="login">Login</button>
+        </form>
+    </div>
+
+    <!-- Admin Login Box -->
+    <div class="login-container" id="adminLoginContainer">
+        <h2>Admin Login</h2>
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="adminUsername">Admin ID:</label>
+                <input type="text" id="adminUsername" name="username" placeholder="Enter Admin ID" required>
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Secret Key:</label>
+                <input type="password" id="adminPassword" name="password" placeholder="Enter Secret Key" required>
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+            <button type="button" class="btn-cancel" onclick="cancelLogin()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Admin Maintenance Menu -->
+    <div class="admin-menu" id="adminMenu">
+        <h2>Admin Maintenance Menu</h2>
+        <button class="login-btn" onclick="showAddProduct()">Add Product</button>
+        <button class="login-btn" onclick="showUpdateProduct()">Update Product</button>
+        <button class="btn-cancel" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Add Product Form -->
+    <div class="login-container" id="addProductContainer">
+        <h2>Add Product</h2>
+        <form id="addProductForm">
+            <div class="form-group">
+                <label for="newProductName">Product Name:</label>
+                <input type="text" id="newProductName" name="productName" placeholder="Enter Product Name" required>
+            </div>
+            <div class="form-group">
+                <label for="newProductPrice">Product Price:</label>
+                <input type="number" id="newProductPrice" name="productPrice" placeholder="Enter Product Price" required>
+            </div>
+            <button type="submit" class="login-btn">Add Product</button>
+            <button type="button" class="btn-cancel" onclick="cancelAdminAction()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Update Product Form -->
+    <div class="login-container" id="updateProductContainer">
+        <h2>Update Product</h2>
+        <form id="updateProductForm">
+            <div class="form-group">
+                <label for="updateProductName">Product Name:</label>
+                <input type="text" id="updateProductName" name="productName" placeholder="Enter Product Name to Update" required>
+            </div>
+            <div class="form-group">
+                <label for="updateProductPrice">New Price:</label>
+                <input type="number" id="updateProductPrice" name="productPrice" placeholder="Enter New Product Price" required>
+            </div>
+            <button type="submit" class="login-btn">Update Product</button>
+            <button type="button" class="btn-cancel" onclick="cancelAdminAction()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Vendor Login Box -->
+    <div class="login-container" id="vendorLoginContainer">
+        <h2>Vendor Login</h2>
+        <form id="vendorLoginForm">
+            <div class="form-group">
+                <label for="vendorUsername">Vendor Code:</label>
+                <input type="text" id="vendorUsername" name="username" placeholder="Enter Vendor Code" required>
+            </div>
+            <div class="form-group">
+                <label for="vendorPassword">Passcode:</label>
+                <input type="password" id="vendorPassword" name="password" placeholder="Enter Passcode" required>
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+            <button type="button" class="btn-cancel" onclick="cancelLogin()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Vendor Product List -->
+    <div class="product-list" id="vendorProductList">
+        <h2>Products for Sale</h2>
+        <div class="product-item">
+            <label for="milkQuantity">Milk - $2.00</label>
+            <select id="milkQuantity">
+                <option value="0">Select Quantity</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="product-item">
+            <label for="butterQuantity">Butter - $1.50</label>
+            <select id="butterQuantity">
+                <option value="0">Select Quantity</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="product-item">
+            <label for="breadQuantity">Bread - $1.00</label>
+            <select id="breadQuantity">
+                <option value="0">Select Quantity</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <button class="login-btn" onclick="buyProducts()">Buy Products</button>
+        <button class="btn-cancel" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- User Login Box -->
+    <div class="login-container" id="userLoginContainer">
+        <h2>User Login</h2>
+        <form id="userLoginForm">
+            <div class="form-group">
+                <label for="userUsername">Username:</label>
+                <input type="text" id="userUsername" name="username" placeholder="Enter Username" required>
+            </div>
+            <div class="form-group">
+                <label for="userPassword">Password:</label>
+                <input type="password" id="userPassword" name="password" placeholder="Enter Password" required>
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+            <button type="button" class="btn-cancel" onclick="cancelLogin()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- User Menu -->
+    <div class="user-menu" id="userMenu">
+        <h2>User Menu</h2>
+        <button class="login-btn" onclick="showCart()">View Cart</button>
+        <button class="login-btn" onclick="checkOrderStatus()">Order Status</button>
+        <button class="btn-cancel" onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        // Handle role selection form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var selectedRole = document.getElementById('role').value;
+
+            document.getElementById('roleSelectionContainer').classList.remove('active');
+
+            if (selectedRole === 'Admin') {
+                document.getElementById('adminLoginContainer').classList.add('active');
+            } else if (selectedRole === 'Vendor') {
+                document.getElementById('vendorLoginContainer').classList.add('active');
+            } else if (selectedRole === 'User') {
+                document.getElementById('userLoginContainer').classList.add('active');
+            }
+        });
+
+        // Handle admin login form submission
+        document.getElementById('adminLoginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('adminLoginContainer').classList.remove('active');
+            document.getElementById('adminMenu').style.display = 'block';
+        });
+
+        // Handle vendor login form submission
+        document.getElementById('vendorLoginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('vendorLoginContainer').classList.remove('active');
+            document.getElementById('vendorProductList').style.display = 'block';
+        });
+
+        // Handle user login form submission
+        document.getElementById('userLoginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('userLoginContainer').classList.remove('active');
+            document.getElementById('userMenu').style.display = 'block';
+        });
+
+        // Handle buying products
+        function buyProducts() {
+            const milkQuantity = document.getElementById('milkQuantity').value;
+            const butterQuantity = document.getElementById('butterQuantity').value;
+            const breadQuantity = document.getElementById('breadQuantity').value;
+
+            let orderSummary = 'You have ordered:\n';
+
+            if (milkQuantity > 0) {
+                orderSummary += `Milk: ${milkQuantity} - $${(milkQuantity * 2).toFixed(2)}\n`;
+            }
+            if (butterQuantity > 0) {
+                orderSummary += `Butter: ${butterQuantity} - $${(butterQuantity * 1.50).toFixed(2)}\n`;
+            }
+            if (breadQuantity > 0) {
+                orderSummary += `Bread: ${breadQuantity} - $${(breadQuantity * 1).toFixed(2)}\n`;
+            }
+
+            if (milkQuantity == 0 && butterQuantity == 0 && breadQuantity == 0) {
+                alert('Please select at least one product to buy.');
+            } else {
+                alert(orderSummary);
+            }
+        }
+
+        // Show Add Product Form
+        function showAddProduct() {
+            document.getElementById('adminMenu').style.display = 'none';
+            document.getElementById('addProductContainer').classList.add('active');
+        }
+
+        // Show Update Product Form
+        function showUpdateProduct() {
+            document.getElementById('adminMenu').style.display = 'none';
+            document.getElementById('updateProductContainer').classList.add('active');
+        }
+
+        // Show User Cart
+        function showCart() {
+            alert('Cart feature not implemented yet.');
+        }
+
+        // Check Order Status
+        function checkOrderStatus() {
+            alert('Order Status feature not implemented yet.');
+        }
+
+        // Handle Add Product Form Submission
+        document.getElementById('addProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const productName = document.getElementById('newProductName').value;
+            const productPrice = document.getElementById('newProductPrice').value;
+            alert(`Product Added: ${productName} - $${productPrice}`);
+            cancelAdminAction();
+        });
+
+        // Handle Update Product Form Submission
+        document.getElementById('updateProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const productName = document.getElementById('updateProductName').value;
+            const productPrice = document.getElementById('updateProductPrice').value;
+            alert(`Product Updated: ${productName} - $${productPrice}`);
+            cancelAdminAction();
+        });
+
+        // Handle cancel action for all admin actions
+        function cancelAdminAction() {
+            document.querySelectorAll('.login-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById('adminMenu').style.display = 'block';
+            document.getElementById('addProductContainer').classList.remove('active');
+            document.getElementById('updateProductContainer').classList.remove('active');
+        }
+
+        // Handle logout action
+        function logout() {
+            document.getElementById('vendorProductList').style.display = 'none';
+            document.getElementById('adminMenu').style.display = 'none';
+            document.getElementById('userMenu').style.display = 'none';
+            cancelLogin();
+        }
+
+        // Handle cancel action for all login forms
+        function cancelLogin() {
+            document.querySelectorAll('.login-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById('roleSelectionContainer').classList.add('active');
+        }
+    </script>
+</body>
+</html>
